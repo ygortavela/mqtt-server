@@ -50,6 +50,9 @@ int main (int argc, char **argv) {
                 recvline[n]=0;
                 uint8_t message_type = recvline[0];
                 uint8_t test[5] = {0x20, 0x03, 0x00, 0x00, 0x00};
+                uint32_t msg_len;
+                int current_position = 0;
+                uint16_t topic_len = 0;
 
                 switch (message_type) {
                     case CONNECT:
@@ -61,7 +64,16 @@ int main (int argc, char **argv) {
                         write(connfd, test, 5);
                         break;
                     case PUBLISH:
-                        printf("[PUBLISH]: %x\n", recvline[0]);
+                        printf("[PUBLISH]: %x\n", recvline[current_position++]);
+                        msg_len = decode_integer_byte(recvline);
+                        printf("msg len: %ld\n", msg_len);
+                        current_position += sizeof_integer_byte(msg_len);
+                        topic_len = merge_unsigned_int_byte(recvline[current_position], recvline[current_position + 1]);
+                        printf("topic len: %ld\n", topic_len);
+                        current_position += 2;
+                        write(1, recvline + current_position, topic_len);
+                        current_position += topic_len + 1;
+                        write(1, recvline + current_position, msg_len - topic_len - 3);
                         break;
                     case PUBACK:
                         printf("[PUBACK]: %x\n", recvline[0]);

@@ -29,6 +29,10 @@ struct timer_info timer;
 struct packet {
   uint8_t message_type;
   uint32_t remaining_length;
+  uint16_t topic_length;
+  char *topic_name;
+  uint8_t properties;
+  char *message;
 };
 
 //void handle_command(struct packet, int fd);
