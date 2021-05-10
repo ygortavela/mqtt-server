@@ -137,14 +137,14 @@ int main (int argc, char **argv) {
             /* Já que está no processo filho, não precisa mais do socket
              * listenfd. Só o processo pai precisa deste socket. */
             close(listenfd);
-
+         
             /* Agora pode ler do socket e escrever no socket. Isto tem
              * que ser feito em sincronia com o cliente. Não faz sentido
              * ler sem ter o que ler. Ou seja, neste caso está sendo
              * considerado que o cliente vai enviar algo para o servidor.
              * O servidor vai processar o que tiver sido enviado e vai
              * enviar uma resposta para o cliente (Que precisará estar
-             * esperando por esta resposta)
+             * esperando por esta resposta) 
              */
 
             /* ========================================================= */
@@ -156,11 +156,12 @@ int main (int argc, char **argv) {
              * para que este servidor consiga interpretar comandos MQTT  */
             while ((n=read(connfd, recvline, MAXLINE)) > 0) {
                 recvline[n]=0;
-                printf("hex: %x\n", recvline[0]);
-                uint8_t test[5] = {0x20, 0x03, 0x00, 0x00, 0x00};
                 printf("[Cliente conectado no processo filho %d enviou:] ",getpid());
-                write(connfd, test, 5);
-                //write(connfd, recvline, strlen(recvline));
+                if ((fputs(recvline,stdout)) == EOF) {
+                    perror("fputs :( \n");
+                    exit(6);
+                }
+                write(connfd, recvline, strlen(recvline));
             }
             /* ========================================================= */
             /* ========================================================= */
