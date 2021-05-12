@@ -46,34 +46,32 @@ int main (int argc, char **argv) {
             printf("[Uma conexão aberta]\n");
             close(listenfd);
 
-            while ((n=read(connfd, recvline, MAXLINE)) > 0) {
-                recvline[n]=0;
-                uint8_t message_type = recvline[0];
-                uint8_t test[5] = {0x20, 0x03, 0x00, 0x00, 0x00};
-                uint32_t msg_len;
-                int current_position = 0;
-                uint16_t topic_len = 0;
+            for (;;) {
+                struct fixed_header *message_header = unpack_fixed_header(connfd);
 
-                switch (message_type) {
+                printf("[message type: %x]\n", message_header->message_type);
+                printf("[remaining_length: %d]\n", message_header->remaining_length);
+                n=read(connfd, recvline, MAXLINE);
+                if (n <= 0) {
+                  free(message_header);
+                  break;
+                }
+                recvline[n]=0;
+                uint8_t *packet_buffer;
+
+                switch (message_header->message_type & 0xf0) {
                     case CONNECT:
                         printf("[CONNECT]: %x\n", recvline[0]);
-                        write(connfd, test, 5);
+                        packet_buffer = allocate_packet(CONNACK_RESPONSE_LENGTH);
+                        pack_connack_response(packet_buffer);
+                        write(connfd, packet_buffer, CONNACK_RESPONSE_LENGTH);
+                        free(packet_buffer);
                         break;
                     case CONNACK:
                         printf("[CONNACK]: %x\n", recvline[0]);
-                        write(connfd, test, 5);
                         break;
                     case PUBLISH:
-                        printf("[PUBLISH]: %x\n", recvline[current_position++]);
-                        msg_len = decode_integer_byte(recvline);
-                        printf("msg len: %ld\n", msg_len);
-                        current_position += sizeof_integer_byte(msg_len);
-                        topic_len = merge_unsigned_int_byte(recvline[current_position], recvline[current_position + 1]);
-                        printf("topic len: %ld\n", topic_len);
-                        current_position += 2;
-                        write(1, recvline + current_position, topic_len);
-                        current_position += topic_len + 1;
-                        write(1, recvline + current_position, msg_len - topic_len - 3);
+                        printf("[PUBLISH]: %x\n", recvline[0]);
                         break;
                     case PUBACK:
                         printf("[PUBACK]: %x\n", recvline[0]);
@@ -100,9 +98,9 @@ int main (int argc, char **argv) {
                         printf("[DISCONNECT]: %x\n", recvline[0]);
                         break;
                 }
-
-                //write(connfd, recvline, strlen(recvline));
+            free(message_header);
             }
+
             printf("[Uma conexão fechada]\n");
             exit(0);
         }

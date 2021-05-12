@@ -12,6 +12,8 @@
 #include <unistd.h>
 
 #include "mqtt.h"
+#include "serialize_packet.h"
+#include "deserialize_packet.h"
 #include "utils.h"
 
 #define LISTENQ 1

@@ -14,14 +14,12 @@ uint32_t encode_integer_byte(uint32_t number) {
   return result;
 }
 
-uint32_t decode_integer_byte(uint8_t *packet_stream) {
+uint32_t decode_integer_byte(int connfd) {
   uint32_t multiplier = 1, value = 0, max_value = 128 * 128 * 128;
   uint8_t encoded_byte;
-  // the index 0 of the packet stream gives the message type on the mqtt protocol
-  size_t pointer_position = 1;
 
   do {
-    encoded_byte = packet_stream[pointer_position++];
+    read(connfd, &encoded_byte, sizeof(uint8_t));
     value += (encoded_byte & 127) * multiplier;
 
     if (multiplier > max_value) return 0;
@@ -45,4 +43,8 @@ size_t sizeof_integer_byte(uint32_t integer_byte) {
   }
 
   return count;
+}
+
+uint8_t *allocate_packet(size_t size) {
+  return malloc(size * sizeof(uint8_t));
 }
