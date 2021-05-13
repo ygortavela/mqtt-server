@@ -9,6 +9,6 @@
 #ifndef DESERIALIZE_PACKET_H
 #define DESERIALIZE_PACKET_H
 
-struct fixed_header *unpack_fixed_header(int connfd);
+ssize_t unpack_fixed_header(int connfd, struct fixed_header *message_header);
 
 #endif
