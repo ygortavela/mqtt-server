@@ -3,7 +3,7 @@
 ssize_t read_connection(int connfd) {
     struct fixed_header *message_header = malloc(sizeof(struct fixed_header));
     void *message;
-    ssize_t packet_size = 0;
+    ssize_t packet_size = 0, test = 0;
     uint8_t *packet_buffer, *response_packet_buffer;
 
     if ((packet_size = unpack_fixed_header(connfd, message_header)) <= 0) {
@@ -36,6 +36,13 @@ ssize_t read_connection(int connfd) {
             free(((struct publish_packet *) message)->topic_name);
             free(((struct publish_packet *) message)->message);
             free(message);
+
+            test = message_header->remaining_length + 5;
+            response_packet_buffer = allocate_packet(test);
+            pack_publish_response(response_packet_buffer, message_header, message);
+            write(connfd, response_packet_buffer, test);
+            free(response_packet_buffer);
+
             break;
         case PUBACK:
             printf("[PUBACK]: %x\n", message_header->message_type);

@@ -34,8 +34,8 @@ uint16_t merge_unsigned_int_byte(uint8_t msbyte, uint8_t lsbyte) {
   return (msbyte << 8) | lsbyte;
 }
 
-size_t sizeof_integer_byte(uint32_t integer_byte) {
-  size_t count = 0;
+ssize_t sizeof_integer_byte(uint32_t integer_byte) {
+  ssize_t count = 0;
 
   while (integer_byte != 0) {
     integer_byte >>= 8;

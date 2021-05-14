@@ -16,8 +16,11 @@
 
 #define MAX_TOPIC_LENGTH 65536
 
-// our basic MQTT server doesn't need a complex connack packet
+// our basic MQTT server doesn't need complex packets
 #define CONNACK_RESPONSE_LENGTH 5
+#define SUBACK_RESPONSE_LENGTH 6
+#define PING_RESPONSE_LENGTH 2
+#define CONNECT_REQUEST_LENGTH 5
 
 struct fixed_header {
   uint8_t message_type;
