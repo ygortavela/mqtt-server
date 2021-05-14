@@ -24,4 +24,12 @@ struct fixed_header {
   uint32_t remaining_length;
 };
 
+struct publish_packet {
+  uint16_t topic_length;
+  char *topic_name;
+  uint8_t properties;
+  ssize_t message_length;
+  char *message;
+};
+
 #endif

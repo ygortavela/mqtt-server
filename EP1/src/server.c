@@ -1,34 +1,41 @@
 #include "server.h"
 
-ssize_t read_packet(int connfd) {
+ssize_t read_connection(int connfd) {
     struct fixed_header *message_header = malloc(sizeof(struct fixed_header));
+    void *message;
     ssize_t packet_size = 0;
     uint8_t *packet_buffer, *response_packet_buffer;
 
-    if((packet_size = unpack_fixed_header(connfd, message_header)) <= 0) {
+    if ((packet_size = unpack_fixed_header(connfd, message_header)) <= 0) {
       free(message_header);
 
       return -1;
     }
 
-    printf("[packet_size]: %d\n", packet_size);
-
-    packet_buffer = malloc(message_header->remaining_length * sizeof(uint8_t));
-    read(connfd, packet_buffer, message_header->remaining_length * sizeof(uint8_t));
-
     switch (message_header->message_type & 0xf0) {
         case CONNECT:
+            packet_buffer = malloc(message_header->remaining_length + 1);
+            read(connfd, packet_buffer, message_header->remaining_length + 1);
             printf("[CONNECT]: %x\n", message_header->message_type);
             response_packet_buffer = allocate_packet(CONNACK_RESPONSE_LENGTH);
             pack_connack_response(response_packet_buffer);
             write(connfd, response_packet_buffer, CONNACK_RESPONSE_LENGTH);
             free(response_packet_buffer);
+            free(packet_buffer);
             break;
         case CONNACK:
             printf("[CONNACK]: %x\n", message_header->message_type);
             break;
         case PUBLISH:
+            message = malloc(sizeof(struct publish_packet));
+            unpack_publish_packet(connfd, message_header, message);
+            write(1, ((struct publish_packet *) message)->topic_name, ((struct publish_packet *) message)->topic_length);
+            write(1, ((struct publish_packet *) message)->message, ((struct publish_packet *) message)->message_length);
             printf("[PUBLISH]: %x\n", message_header->message_type);
+
+            free(((struct publish_packet *) message)->topic_name);
+            free(((struct publish_packet *) message)->message);
+            free(message);
             break;
         case PUBACK:
             printf("[PUBACK]: %x\n", message_header->message_type);
@@ -53,12 +60,12 @@ ssize_t read_packet(int connfd) {
             break;
         case DISCONNECT:
             printf("[DISCONNECT]: %x\n", message_header->message_type);
+            close(connfd);
             break;
     }
 
 
     free(message_header);
-    free(packet_buffer);
 
     return packet_size;
 }
@@ -100,7 +107,7 @@ int main (int argc, char **argv) {
     printf("[Para finalizar, pressione CTRL+c ou rode um kill ou killall]\n");
 
     for (;;) {
-        if ((connfd = accept(listenfd, (struct sockaddr *) NULL, NULL)) == -1 ) {
+        if ((connfd = accept(listenfd, (struct sockaddr *) NULL, NULL)) == -1) {
               perror("accept :(\n");
               exit(5);
           }
@@ -109,8 +116,8 @@ int main (int argc, char **argv) {
             printf("[Uma conexão aberta]\n");
             close(listenfd);
 
-            while ((n=read_packet(connfd)) > 0) {
-                printf("[Cliente conectado no processo filho %d enviou:] ",getpid());
+            while ((n = read_connection(connfd)) > 0) {
+                printf("[Cliente conectado no processo filho %d]\n\n", getpid());
             }
 
             printf("[Uma conexão fechada]\n");
