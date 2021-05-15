@@ -25,6 +25,7 @@
 struct fixed_header {
   uint8_t message_type;
   uint32_t remaining_length;
+  size_t remaining_length_size;
 };
 
 struct publish_packet {
