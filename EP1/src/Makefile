@@ -1,10 +1,11 @@
 CC      = gcc
+CC_PTH  = -pthread
 CFLAGS  = -Wall -std=c99 -g -O0 -pedantic -Wno-unused-result -Wno-unused-function
 RM      = rm
 OBJS    = utils.o serialize_packet.o deserialize_packet.o
 
 all: $(OBJS)
-	$(CC) $(OBJS) -o server -lm server.c
+	$(CC) $(CC_PTH) $(OBJS) -o server -lm server.c
 
 utils.o: utils.c utils.h
 	$(CC) $(CFLAGS) -c utils.c

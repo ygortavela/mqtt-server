@@ -10,6 +10,8 @@
 #include <arpa/inet.h>
 #include <time.h>
 #include <unistd.h>
+#include <pthread.h>
+#include <search.h>
 
 #include "mqtt.h"
 #include "serialize_packet.h"
@@ -17,7 +19,8 @@
 #include "utils.h"
 
 #define LISTENQ 1
-#define MAXLINE 4096
+#define MAX_THREADS 256
+#define HASH_MAX_ENTRIES 1024
 
 #ifndef SERVER_H
 #define SERVER_H

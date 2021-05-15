@@ -104,3 +104,19 @@ void destroy_fd_list(fd_list list) {
   free(list->fd_array);
   free(list);
 }
+
+topic init_topic(uint16_t topic_length, char *topic_name) {
+ topic new_topic = malloc(sizeof(struct topic_));
+
+ new_topic->topic_length = topic_length;
+ strncpy(new_topic->topic_name, topic_name, topic_length);
+ new_topic->fd_list_to_publish = init_fd_list();
+
+ return new_topic;
+}
+
+void destroy_topic(topic old_topic) {
+  free(old_topic->topic_name);
+  destroy_fd_list(old_topic->fd_list_to_publish);
+  free(old_topic);
+}

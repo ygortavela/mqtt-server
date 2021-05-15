@@ -1,5 +1,8 @@
 #include "server.h"
 
+int n_threads;
+pthread_mutex_t lock;
+
 ssize_t read_connection(int connfd) {
     struct fixed_header *message_header = malloc(sizeof(struct fixed_header));
     void *message;
@@ -94,7 +97,6 @@ int main (int argc, char **argv) {
     int listenfd, connfd;
     struct sockaddr_in servaddr;
     pid_t childpid;
-    char recvline[MAXLINE + 1];
     ssize_t n;
 
     if (argc != 2) {
