@@ -37,7 +37,6 @@ void unpack_publish_packet(int connfd, struct fixed_header *message_header, stru
 void unpack_subscribe_packet(int connfd, struct fixed_header *message_header, struct subscribe_packet * subscribe_message) {
   subscribe_message->message_id = 0;
   subscribe_message->topic_length = 0;
-  subscribe_message->message_length = 0;
 
   read(connfd, &subscribe_message->message_id, sizeof(uint16_t) + 1);
   subscribe_message->message_id = ntohs(subscribe_message->message_id);

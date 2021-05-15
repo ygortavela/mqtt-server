@@ -37,7 +37,7 @@ struct publish_packet {
 };
 
 struct subscribe_packet {
-  uint8_t message_id[2];
+  uint16_t message_id;
   uint8_t properties;
   uint16_t topic_length;
   char *topic_name;
