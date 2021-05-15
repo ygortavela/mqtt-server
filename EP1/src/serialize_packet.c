@@ -32,14 +32,32 @@ void pack_connect_request(uint8_t *buffer) {
 void pack_publish_response(uint8_t *buffer, struct fixed_header *message_header, struct publish_packet *publish_message) {
   uint32_t encoded_remaining_length = encode_integer_byte(message_header->remaining_length);
   ssize_t sizeof_remaining_length = sizeof_integer_byte(encoded_remaining_length);
-  uint32_t test = htonl(encoded_remaining_length);
+  union ui32_to_ui8 remaining_length_to_ui8;
+  union ui16_to_ui8 topic_length_to_ui8;
+  size_t buffer_position = 0;
 
-  printf("aaa %x\n", encoded_remaining_length);
-  printf("bbb %x\n", encoded_remaining_length & 0xff00);
+  remaining_length_to_ui8.ui32 = encoded_remaining_length;
+  topic_length_to_ui8.ui16 = publish_message->topic_length;
 
-  buffer[0] = PUBLISH;
-  buffer[1] = (encoded_remaining_length & 0xff000000) >> 3;
-  buffer[2] = (encoded_remaining_length & 0x00ff0000) >> 2;
-  buffer[5] = 0xff;
+  // pack message type
+  buffer[buffer_position++] = PUBLISH;
 
+  // pack remaining length
+  for (int i = sizeof_remaining_length, j = 0; i > 0; i--, j++) {
+    buffer[i] = remaining_length_to_ui8.ui8[j];
+  }
+  buffer_position += sizeof_remaining_length;
+
+  // pack topic length
+  buffer[buffer_position++] = topic_length_to_ui8.ui8[1];
+  buffer[buffer_position++] = topic_length_to_ui8.ui8[0];
+
+  // pack topic name
+  copy_string_to_buffer(buffer, &buffer_position, publish_message->topic_name, publish_message->topic_length);
+
+  // pack properties
+  buffer[buffer_position++] = 0x00;
+
+  // pack message
+  copy_string_to_buffer(buffer, &buffer_position, publish_message->message, publish_message->message_length);
 }

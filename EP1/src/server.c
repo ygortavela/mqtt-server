@@ -29,19 +29,20 @@ ssize_t read_connection(int connfd) {
         case PUBLISH:
             message = malloc(sizeof(struct publish_packet));
             unpack_publish_packet(connfd, message_header, message);
+            printf("bla %d\n", ((struct publish_packet *) message)->topic_length);
             write(1, ((struct publish_packet *) message)->topic_name, ((struct publish_packet *) message)->topic_length);
             write(1, ((struct publish_packet *) message)->message, ((struct publish_packet *) message)->message_length);
             printf("[PUBLISH]: %x\n", message_header->message_type);
-
-            free(((struct publish_packet *) message)->topic_name);
-            free(((struct publish_packet *) message)->message);
-            free(message);
 
             test = message_header->remaining_length + 5;
             response_packet_buffer = allocate_packet(test);
             pack_publish_response(response_packet_buffer, message_header, message);
             write(connfd, response_packet_buffer, test);
+
             free(response_packet_buffer);
+            free(((struct publish_packet *) message)->topic_name);
+            free(((struct publish_packet *) message)->message);
+            free(message);
 
             break;
         case PUBACK:

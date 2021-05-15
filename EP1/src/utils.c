@@ -48,3 +48,8 @@ ssize_t sizeof_integer_byte(uint32_t integer_byte) {
 uint8_t *allocate_packet(size_t size) {
   return malloc(size * sizeof(uint8_t));
 }
+
+void copy_string_to_buffer(uint8_t *buffer, size_t *buffer_position, char *string, size_t string_size) {
+  for (size_t current_index = 0; current_index < string_size; current_index++)
+    buffer[(*buffer_position)++] = string[current_index];
+}
