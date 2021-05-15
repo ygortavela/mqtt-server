@@ -14,10 +14,10 @@ void pack_suback_response(uint8_t *buffer) {
     buffer[i] = suback_response[i];
 }
 
-void pack_ping_response(uint8_t *buffer) {
-  uint8_t ping_response[PING_RESPONSE_LENGTH] = { PINGRESP, 0x00 };
+void pack_pingresp_response(uint8_t *buffer) {
+  uint8_t ping_response[PINGRESP_RESPONSE_LENGTH] = { PINGRESP, 0x00 };
 
-  for (int i = 0; i < PING_RESPONSE_LENGTH; i++)
+  for (int i = 0; i < PINGRESP_RESPONSE_LENGTH; i++)
     buffer[i] = ping_response[i];
 }
 
@@ -54,7 +54,7 @@ void pack_publish_response(uint8_t *buffer, struct fixed_header *message_header,
   copy_string_to_buffer(buffer, &buffer_position, publish_message->topic_name, publish_message->topic_length);
 
   // pack properties
-  buffer[buffer_position++] = 0x00;
+  buffer[buffer_position++] = publish_message->properties;
 
   // pack message
   copy_string_to_buffer(buffer, &buffer_position, publish_message->message, publish_message->message_length);

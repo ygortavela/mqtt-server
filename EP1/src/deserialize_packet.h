@@ -12,5 +12,6 @@
 
 ssize_t unpack_fixed_header(int connfd, struct fixed_header *message_header);
 void unpack_publish_packet(int connfd, struct fixed_header *message_header, struct publish_packet * publish_message);
+void unpack_subscribe_packet(int connfd, struct fixed_header *message_header, struct subscribe_packet * subscribe_message);
 
 #endif

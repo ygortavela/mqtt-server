@@ -32,7 +32,6 @@ ssize_t read_connection(int connfd) {
             unpack_publish_packet(connfd, message_header, message);
 
             packet_size += message_header->remaining_length;
-            printf("packet sizae: %d\n", packet_size);
             response_packet_buffer = allocate_packet(packet_size);
             pack_publish_response(response_packet_buffer, message_header, message);
             write(connfd, response_packet_buffer, packet_size);
@@ -47,7 +46,15 @@ ssize_t read_connection(int connfd) {
             printf("[PUBACK]: %x\n", message_header->message_type);
             break;
         case SUBSCRIBE:
+            packet_buffer = malloc(message_header->remaining_length + 1);
+            read(connfd, packet_buffer, message_header->remaining_length + 1);
             printf("[SUBSCRIBE]: %x\n", message_header->message_type);
+            response_packet_buffer = allocate_packet(SUBACK_RESPONSE_LENGTH);
+            pack_suback_response(response_packet_buffer);
+            write(connfd, response_packet_buffer, SUBACK_RESPONSE_LENGTH);
+            free(response_packet_buffer);
+            free(packet_buffer);
+            break;
             break;
         case SUBACK:
             printf("[SUBACK]: %x\n", message_header->message_type);
@@ -59,7 +66,14 @@ ssize_t read_connection(int connfd) {
             printf("[UNSUBACK]: %x\n", message_header->message_type);
             break;
         case PINGREQ:
+            packet_buffer = malloc(message_header->remaining_length + 1);
+            read(connfd, packet_buffer, message_header->remaining_length + 1);
             printf("[PINGREQ]: %x\n", message_header->message_type);
+            response_packet_buffer = allocate_packet(PINGRESP_RESPONSE_LENGTH);
+            pack_pingresp_response(response_packet_buffer);
+            write(connfd, response_packet_buffer, PINGRESP_RESPONSE_LENGTH);
+            free(response_packet_buffer);
+            free(packet_buffer);
             break;
         case PINGRESP:
             printf("[PINGRESP]: %x\n", message_header->message_type);

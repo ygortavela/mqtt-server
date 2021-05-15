@@ -19,7 +19,7 @@
 // our basic MQTT server doesn't need complex packets
 #define CONNACK_RESPONSE_LENGTH 5
 #define SUBACK_RESPONSE_LENGTH 6
-#define PING_RESPONSE_LENGTH 2
+#define PINGRESP_RESPONSE_LENGTH 2
 #define CONNECT_REQUEST_LENGTH 5
 
 struct fixed_header {
@@ -34,6 +34,14 @@ struct publish_packet {
   uint8_t properties;
   ssize_t message_length;
   char *message;
+};
+
+struct subscribe_packet {
+  uint8_t message_id[2];
+  uint8_t properties;
+  uint16_t topic_length;
+  char *topic_name;
+  uint8_t subscribe_options;
 };
 
 #endif

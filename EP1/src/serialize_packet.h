@@ -12,7 +12,7 @@
 
 void pack_connack_response(uint8_t *buffer);
 void pack_suback_response(uint8_t *buffer);
-void pack_ping_response(uint8_t *buffer);
+void pack_pingresp_response(uint8_t *buffer);
 void pack_connect_request(uint8_t *buffer);
 void pack_publish_response(uint8_t *buffer, struct fixed_header *message_header, struct publish_packet *publish_message);
 
