@@ -103,9 +103,11 @@ void subscribe_callback(int connfd, struct subscribe_packet *message) {
     new_topic = init_topic(message->topic_length, message->topic_name);
     HASH_ADD_STR(topics_hash, topic_name, new_topic);
   }
-
-  fd_list_push(new_topic->fd_list_to_publish, connfd);
   pthread_mutex_unlock(&hash_lock);
+
+  pthread_mutex_lock(&new_topic->lock);
+  fd_list_push(new_topic->fd_list_to_publish, connfd);
+  pthread_mutex_unlock(&new_topic->lock);
 
   while (1) {
     n = read(connfd, buffer_request, PINGREQ_REQUEST_LENGTH);
@@ -120,10 +122,9 @@ void subscribe_callback(int connfd, struct subscribe_packet *message) {
 
       free(response_packet_buffer);
     } else if (message_type == DISCONNECT) {
-      printf("indo pro loop \n");
-      pthread_mutex_lock(&new_topic->lock);
+      pthread_mutex_lock(&(new_topic->lock));
       fd_list_delete(new_topic->fd_list_to_publish, connfd);
-      pthread_mutex_unlock(&new_topic->lock);
+      pthread_mutex_unlock(&(new_topic->lock));
 
       break;
     }
@@ -133,7 +134,6 @@ void subscribe_callback(int connfd, struct subscribe_packet *message) {
 void publish_callback(int connfd, struct fixed_header *message_header, struct publish_packet *message, ssize_t packet_size) {
   uint8_t *response_packet_buffer;
   topic new_topic;
-  printf("topic no publish: %s\n", message->topic_name);
 
   pthread_mutex_lock(&hash_lock);
   HASH_FIND_STR(topics_hash, message->topic_name, new_topic);
@@ -146,7 +146,6 @@ void publish_callback(int connfd, struct fixed_header *message_header, struct pu
     pthread_mutex_lock(&new_topic->lock);
     for (int i = 0, fd_to_publish; i < new_topic->fd_list_to_publish->size; i++) {
       fd_to_publish = new_topic->fd_list_to_publish->fd_array[i];
-      printf("fd to publish: %d\n", fd_to_publish);
       write(fd_to_publish, response_packet_buffer, packet_size);
     }
     pthread_mutex_unlock(&new_topic->lock);
@@ -155,6 +154,19 @@ void publish_callback(int connfd, struct fixed_header *message_header, struct pu
     free(((struct publish_packet *) message)->topic_name);
     free(((struct publish_packet *) message)->message);
   }
+}
+
+void free_hash_memory() {
+  topic old_topic, tmp;
+  printf("[destroi]\n");
+
+  HASH_ITER(hh, topics_hash, old_topic, tmp) {
+    HASH_DEL(topics_hash, old_topic);
+    pthread_mutex_destroy(&(old_topic->lock));
+    destroy_topic(old_topic);
+  }
+
+  pthread_mutex_destroy(&hash_lock);
 }
 
 int main (int argc, char **argv) {
@@ -209,6 +221,6 @@ int main (int argc, char **argv) {
     pthread_create(&(request->request_thread), NULL, handle_new_request, (void *) request);
   }
 
-  pthread_mutex_destroy(&hash_lock);
+  free_hash_memory();
   exit(0);
 }
