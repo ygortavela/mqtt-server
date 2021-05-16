@@ -1,7 +1,7 @@
 #ifndef MQTT_H
 #define MQTT_H
 
-// message types handle by our basic MQTT server
+// message types
 #define CONNECT 0x10u
 #define CONNACK 0x20u
 #define PUBLISH 0x30u

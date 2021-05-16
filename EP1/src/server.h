@@ -18,6 +18,7 @@
 #include "deserialize_packet.h"
 #include "utils.h"
 #include "uthash.h"
+#include "utlist.h"
 
 #define LISTENQ 1
 #define MAX_THREADS 256
