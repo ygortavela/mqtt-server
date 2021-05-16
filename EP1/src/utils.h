@@ -3,7 +3,11 @@
 #include <unistd.h>
 #include <time.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
+#include <pthread.h>
+
+#include "uthash.h"
 
 #ifndef UTILS_H
 #define UTILS_H
@@ -22,6 +26,8 @@ struct topic_ {
   uint16_t topic_length;
   char *topic_name;
   fd_list fd_list_to_publish;
+  UT_hash_handle hh;
+  pthread_mutex_t lock;
 };
 
 typedef struct topic_ *topic;

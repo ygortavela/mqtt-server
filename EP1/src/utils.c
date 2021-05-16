@@ -74,7 +74,7 @@ int fd_list_delete(fd_list list, int fd) {
 
       list->size--;
 
-      if (list->size == list->capacity/4)
+      if (list->size > 0 && list->size == list->capacity/8)
         resize_fd_list(list, list->capacity/2);
 
       return 1;
@@ -87,7 +87,7 @@ int fd_list_delete(fd_list list, int fd) {
 void resize_fd_list(fd_list list, size_t new_capacity) {
   int *new_fd_array = malloc(new_capacity * sizeof(int));
 
-  for (int i = 0; i < list->capacity; i++)
+  for (int i = 0; i < list->size; i++)
     new_fd_array[i] = list->fd_array[i];
 
   free(list->fd_array);
@@ -101,17 +101,23 @@ void destroy_fd_list(fd_list list) {
 }
 
 topic init_topic(uint16_t topic_length, char *topic_name) {
- topic new_topic = malloc(sizeof(struct topic_));
+  topic new_topic = malloc(sizeof(struct topic_));
+  new_topic->topic_name = malloc((1 + topic_length) * sizeof(char));
 
- new_topic->topic_length = topic_length;
- strncpy(new_topic->topic_name, topic_name, topic_length);
- new_topic->fd_list_to_publish = init_fd_list();
+  new_topic->topic_length = topic_length;
+  strncpy(new_topic->topic_name, topic_name, topic_length);
+  new_topic->topic_name[topic_length] = '\0';
+  new_topic->fd_list_to_publish = init_fd_list();
 
- return new_topic;
+  if (pthread_mutex_init(&(new_topic->lock), NULL) != 0)
+    printf("Falha ao iniciar lock do topico\n");
+
+  return new_topic;
 }
 
 void destroy_topic(topic old_topic) {
   free(old_topic->topic_name);
   destroy_fd_list(old_topic->fd_list_to_publish);
+  pthread_mutex_destroy(&(old_topic->lock));
   free(old_topic);
 }

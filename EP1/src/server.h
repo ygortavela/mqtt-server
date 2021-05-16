@@ -11,12 +11,12 @@
 #include <time.h>
 #include <unistd.h>
 #include <pthread.h>
-#include <search.h>
 
 #include "mqtt.h"
 #include "serialize_packet.h"
 #include "deserialize_packet.h"
 #include "utils.h"
+#include "uthash.h"
 
 #define LISTENQ 1
 #define MAX_THREADS 256
@@ -35,4 +35,5 @@ typedef struct request_info_ *request_info;
 void *handle_new_request(void *arg);
 int read_connection(int connfd);
 void subscribe_callback(int connfd, struct subscribe_packet *message);
+void publish_callback(int connfd, struct fixed_header *message_header, struct publish_packet *message, ssize_t packet_size);
 #endif
