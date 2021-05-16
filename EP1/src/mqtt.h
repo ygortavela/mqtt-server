@@ -19,6 +19,7 @@
 // our basic MQTT server doesn't need complex packets
 #define CONNACK_RESPONSE_LENGTH 5
 #define SUBACK_RESPONSE_LENGTH 6
+#define PINGREQ_REQUEST_LENGTH 2
 #define PINGRESP_RESPONSE_LENGTH 2
 #define CONNECT_REQUEST_LENGTH 5
 

@@ -24,11 +24,15 @@
 
 #ifndef SERVER_H
 #define SERVER_H
-struct timer_info {
-    struct timespec t_start;
-    struct timespec t_end;
+
+struct request_info_ {
+  int fd;
+  pthread_t request_thread;
 };
 
-struct timer_info timer;
+typedef struct request_info_ *request_info;
 
+void *handle_new_request(void *arg);
+int read_connection(int connfd);
+void subscribe_callback(int connfd, struct subscribe_packet *message);
 #endif

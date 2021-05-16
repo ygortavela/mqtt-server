@@ -41,7 +41,6 @@ uint32_t decode_integer_byte(int connfd);
 uint16_t merge_unsigned_int_byte(uint8_t msbyte, uint8_t lsbyte) ;
 ssize_t sizeof_integer_byte(uint32_t integer_byte);
 uint8_t *allocate_packet(size_t size);
-void copy_string_to_buffer(uint8_t *buffer, size_t *buffer_position, char *string, size_t string_size);
 
 fd_list init_fd_list();
 void fd_list_push(fd_list list, int new_fd);

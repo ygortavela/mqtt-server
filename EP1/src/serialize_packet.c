@@ -51,11 +51,13 @@ void pack_publish_response(uint8_t *buffer, struct fixed_header *message_header,
   buffer[buffer_position++] = topic_length_to_ui8.ui8[0];
 
   // pack topic name
-  copy_string_to_buffer(buffer, &buffer_position, publish_message->topic_name, publish_message->topic_length);
+  strncpy((char *) buffer + buffer_position, publish_message->topic_name, publish_message->topic_length);
+  buffer_position += publish_message->topic_length;
 
   // pack properties
   buffer[buffer_position++] = publish_message->properties;
 
   // pack message
-  copy_string_to_buffer(buffer, &buffer_position, publish_message->message, publish_message->message_length);
+  strncpy((char *) buffer + buffer_position, publish_message->message, publish_message->message_length);
+  buffer_position += publish_message->message_length;
 }
