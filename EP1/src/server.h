@@ -11,6 +11,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <signal.h>
 
 #include "mqtt.h"
 #include "serialize_packet.h"
@@ -25,16 +26,12 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-struct request_info_ {
-  int fd;
-  pthread_t request_thread;
-};
-
-typedef struct request_info_ *request_info;
-
 void *handle_new_request(void *arg);
 int read_connection(int connfd);
 void subscribe_callback(int connfd, struct subscribe_packet *message);
 void publish_callback(int connfd, struct fixed_header *message_header, struct publish_packet *message, ssize_t packet_size);
 void free_hash_memory();
+void free_requests_ll();
+void sigint_handler(int signal);
+
 #endif

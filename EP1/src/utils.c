@@ -121,3 +121,14 @@ void destroy_topic(topic old_topic) {
   pthread_mutex_destroy(&(old_topic->lock));
   free(old_topic);
 }
+
+void delete_request_from_list(request_info request) {
+  if (request->previous_request != NULL)
+    request->previous_request->next_request = request->next_request;
+
+  if (request->next_request != NULL)
+    request->next_request->previous_request = request->previous_request;
+
+  close(request->fd);
+  free(request);
+}

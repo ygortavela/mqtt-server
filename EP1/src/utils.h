@@ -32,6 +32,15 @@ struct topic_ {
 
 typedef struct topic_ *topic;
 
+struct request_info_ {
+  int fd;
+  pthread_t request_thread;
+  struct request_info_ *previous_request;
+  struct request_info_ *next_request;
+};
+
+typedef struct request_info_ *request_info;
+
 union ui32_to_ui8 {
     uint32_t ui32;
     uint8_t ui8[4];
@@ -56,4 +65,6 @@ void destroy_fd_list(fd_list list);
 
 topic init_topic(uint16_t topic_lenght, char *topic_name);
 void destroy_topic(topic old_topic);
+
+void delete_request_from_list(request_info request);
 #endif
