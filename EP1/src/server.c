@@ -111,7 +111,6 @@ void publish_callback(int connfd, struct fixed_header *message_header, struct pu
 void subscribe_callback(int connfd, struct subscribe_packet *message) {
   uint8_t buffer_request[PINGREQ_REQUEST_LENGTH], message_type;
   topic new_topic;
-  int n;
 
   pthread_mutex_lock(&hash_lock);
   HASH_FIND_STR(topics_hash, message->topic_name, new_topic);
@@ -130,11 +129,7 @@ void subscribe_callback(int connfd, struct subscribe_packet *message) {
   fd_list_push(new_topic->fd_list_to_publish, connfd);
   pthread_mutex_unlock(&new_topic->lock);
 
-  while (1) {
-    n = read(connfd, buffer_request, PINGREQ_REQUEST_LENGTH);
-
-    if (n <= 0) continue;
-
+  while (read(connfd, buffer_request, PINGREQ_REQUEST_LENGTH) > 0) {
     message_type = buffer_request[0] & 0xf0;
 
     if (message_type == PINGREQ) {
