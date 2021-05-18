@@ -5,13 +5,13 @@ request_info requests_head = NULL;
 pthread_mutex_t hash_lock, requests_lock;
 
 void *handle_new_request(void *arg) {
-  int n;
   request_info request = (request_info) arg;
+
   pthread_mutex_lock(&requests_lock);
   DL_APPEND(requests_head, request);
   pthread_mutex_unlock(&requests_lock);
 
-  while ((n = read_connection(request->fd)) > 0);
+  while (read_connection(request->fd) > 0);
 
   pthread_mutex_lock(&requests_lock);
   close(request->fd);
