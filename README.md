@@ -1,9 +1,13 @@
-EP1 - MAC0352
-Autor: Ygor Tavela Alves
-nUSP: 10687642
+## EP1 - MAC0352
+
+## Autor: Ygor Tavela Alves
 
 
-# ARQUIVOS
+# Arquitetura
+
+![arquitetura](arquitetura.png)
+
+# Arquivos
 Na raiz deste projeto encontram-se um Makefile para compilar o programa, um bash script para executar testes de perfomance de cpu/memória, um arquivo slides.pdf contendo uma breve apresentação do EP1, um diretório tests/ contendo as gráficos de performance dos testes realizados e, por fim, o diretório src/ que contém o código fonte do projeto.
 O diretório src/ se organiza da seguinte maneira:
 - header e implementação do servidor MQTT (server.h e server.c)
@@ -15,19 +19,19 @@ O diretório src/ se organiza da seguinte maneira:
   - créditos: https://github.com/troydhanson/uthash
 
 
-# COMPILANDO O PROGRAMA
+# Compilando o programa
 O programa pode ser compilado através do programa make, utilizando o Makefile presente na pasta raiz do EP. Há duas opções para executar o make:
   - make: compilação padrão do programa gerando executável server no diretório;
   - make clean: apaga programa
 
 
-# EXECUTANDO O PROGRAMA
+# Executando o programa
 O programa pode ser executado após compilação utilazando o make. Para isto, basta executar o comando:
 ./server #porta_de_rede
   - #porta_de_rede: porta em que o servidor irá ficar escutando as requisições.
 
 
-# SOBRE O BASH SCRIPT DE TESTE
+# Sobre o bash script de teste
 O bash script tem por função testar apenas a CPU e Memória utilizada pelo servidor MQTT para uma dada quantidade de clientes. Para uma entrada de clientes X, o programa irá iniciar X subscribers e por um intervalo de 60s, a cada 5s, X publishers irá publicar uma mensagem no tópico correspondente.
 Para realizar análise de consumo de rede pode ser utilizado a própria interface do Wireshark (Statistics -> I/O Graphs) enquanto o bash script é executado.
 Para executar o bash script, basta executar:
@@ -40,6 +44,6 @@ Por exemplo,
 irá executar um teste em que será iniciado 50 subscribers, e durante um intervalo de 60 segundos, a cada 5s, 50 publishers irá publicar no tópico correspondente.
 
 
-# DEPENDÊNCIAS
+# Dependências
 bash script p/ execução de testes:
 - psrecord: Geração de gráfico de perfomance cpu/memória, para instalar: $ pip3 install psrecord
